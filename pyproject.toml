@@ -1,7 +1,7 @@
 [project]
 name = "biomechanics-microprocessor"
 version = "0.1.0"
-description = "Add your description here"
+description = "PyQt6 GUI application for BioMechanics Microprocessor control"
 readme = "README.md"
-requires-python = ">=3.13"
-dependencies = []
+requires-python = ">=3.10"
+dependencies = ["pyserial>=3.5", "PyQt6>=6.6.0"]

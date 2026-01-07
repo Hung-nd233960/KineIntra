@@ -3,6 +3,8 @@ import enum
 
 SOF = b"\xa5\x5a"
 PROTOCOL_VER = 0x01
+MAX_PAYLOAD_SIZE = 0xFFFF  # 65535 bytes
+MAX_CONSECUTIVE_ERRORS = 5
 
 
 class FrameType(enum.IntEnum):
