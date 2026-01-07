@@ -164,4 +164,4 @@ stty -f /dev/ttyUSB0  # Replace with your port
 
 **You're ready to go!** 🚀
 
-If you have issues, check [SETUP.md](SETUP.md) for comprehensive troubleshooting.
+If you have issues, cvheck [SETUP.md](SETUP.md) for comprehensive troubleshooting.

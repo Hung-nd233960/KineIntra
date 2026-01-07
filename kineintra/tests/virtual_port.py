@@ -10,9 +10,9 @@ import threading
 import time
 from queue import Queue
 from typing import Optional, Callable
-from protocol.config import SOF, PROTOCOL_VER, FrameType, CmdID
-from protocol.packet_maker import HostPacketMaker
-from protocol.packet_reader import ByteReader, FrameParseResult
+from kineintra.protocol.config import SOF, PROTOCOL_VER, FrameType, CmdID
+from kineintra.protocol.packet_maker import HostPacketMaker
+from kineintra.protocol.packet_reader import ByteReader, FrameParseResult
 
 
 class VirtualBiomechanicsDevice:
@@ -103,7 +103,7 @@ class VirtualBiomechanicsDevice:
 
     def _pack_frame(self, msg_type: int, payload: bytes) -> bytes:
         """Pack a frame with SOF, header, payload, and CRC."""
-        from protocol.config import crc16_ccitt
+        from kineintra.protocol.config import crc16_ccitt
 
         header_inner = struct.pack("<BBH", PROTOCOL_VER, msg_type, len(payload))
         crc_val = crc16_ccitt(header_inner + payload)
@@ -261,7 +261,7 @@ def mock_serial_module():
     Call this in test setup.
     """
     import sys
-    import protocol.serial_connection as sc
+    import kineintra.protocol.serial_connection as sc
 
     # Replace serial module with virtual implementation
     virtual_serial = VirtualSerialModule()

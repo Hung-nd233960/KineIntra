@@ -13,8 +13,8 @@ from dataclasses import dataclass
 from enum import Enum
 import logging
 import serial
-from protocol.packet_reader import ByteReader, FrameParseResult
-from protocol.config import MAX_CONSECUTIVE_ERRORS
+from kineintra.protocol.packet_reader import ByteReader, FrameParseResult
+from kineintra.protocol.config import MAX_CONSECUTIVE_ERRORS
 
 
 class ConnectionState(Enum):

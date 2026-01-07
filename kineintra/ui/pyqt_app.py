@@ -43,20 +43,20 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QObject, QThread, QSize
 from PyQt6.QtGui import QIcon, QColor, QFont
 
-from protocol.serial_connection import (
+from kineintra.protocol.serial_connection import (
     SerialPortConnection,
     SerialConfig,
     ConnectionState,
 )
-from protocol.protocol_parser import (
+from kineintra.protocol.protocol_parser import (
     ProtocolParser,
     StatusPayload,
     DataPayload,
     AckPayload,
     ErrorPayload,
 )
-from protocol.frame_maker_api import HostPacketMakerAPI
-from protocol.packet_reader import FrameParseResult
+from kineintra.protocol.frame_maker_api import HostPacketMakerAPI
+from kineintra.protocol.packet_reader import FrameParseResult
 import serial.tools.list_ports
 
 

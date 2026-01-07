@@ -9,8 +9,8 @@ from dataclasses import dataclass
 from typing import Dict, Union, Optional
 import struct
 
-from protocol.config import FrameType
-from protocol.packet_reader import FrameParseResult
+from kineintra.protocol.config import FrameType
+from kineintra.protocol.packet_reader import FrameParseResult
 
 
 @dataclass

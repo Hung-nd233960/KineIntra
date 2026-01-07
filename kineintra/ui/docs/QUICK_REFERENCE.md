@@ -1,21 +1,5 @@
 # PyQt Application - Quick Reference Card
 
-## Installation Quick Reference
-
-```bash
-# Setup (one-time)
-cd /path/to/BioMechanics_Microprocessor
-python3 -m venv venv
-source venv/bin/activate          # Linux/Mac
-# or venv\Scripts\activate          # Windows
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run application
-python run_app.py
-```
-
 ## Connection Control - Quick Reference
 
 | Task | Steps |

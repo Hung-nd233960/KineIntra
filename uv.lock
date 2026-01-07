@@ -5,7 +5,7 @@ requires-python = ">=3.10"
 [[package]]
 name = "biomechanics-microprocessor"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "pyqt6" },
     { name = "pyserial" },

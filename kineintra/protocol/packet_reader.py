@@ -1,7 +1,7 @@
 from typing import List, TypeVar
 from dataclasses import dataclass
 import struct
-from protocol.config import SOF, crc16_ccitt, MAX_PAYLOAD_SIZE
+from kineintra.protocol.config import SOF, crc16_ccitt, MAX_PAYLOAD_SIZE
 
 
 @dataclass

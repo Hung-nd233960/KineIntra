@@ -7,7 +7,7 @@ Usage:
 """
 
 import sys
-from ui.pyqt_app import main
+from kineintra.ui.pyqt_app import main
 
 if __name__ == "__main__":
     main()

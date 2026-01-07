@@ -1,5 +1,5 @@
 from typing import Mapping
-from protocol.packet_maker import HostPacketMaker
+from kineintra.protocol.packet_maker import HostPacketMaker
 
 SENSOR_COUNT_LIMIT = 32  # Maximum number of sensors supported
 

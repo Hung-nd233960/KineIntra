@@ -1,3 +1,8 @@
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "biomechanics-microprocessor"
 version = "0.1.0"
@@ -5,3 +10,8 @@ description = "PyQt6 GUI application for BioMechanics Microprocessor control"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = ["pyserial>=3.5", "PyQt6>=6.6.0"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["kineintra*"]
+exclude = ["data_processing*", "tests*"]

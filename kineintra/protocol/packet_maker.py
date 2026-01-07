@@ -1,5 +1,5 @@
 import struct
-from protocol.config import SOF, PROTOCOL_VER, FrameType, CmdID
+from kineintra.protocol.config import SOF, PROTOCOL_VER, FrameType, CmdID
 
 # --- 1. Constants & Definitions ---
 
