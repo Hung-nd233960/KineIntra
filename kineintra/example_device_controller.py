@@ -11,20 +11,20 @@ This example demonstrates how to:
 import time
 import logging
 from typing import Optional
-from protocol.serial_connection import (
+from kineintra.protocol.serial.serial_connection import (
     SerialPortConnection,
     SerialConfig,
-    PortDetector,
     ConnectionState,
 )
-from protocol.protocol_parser import (
+from kineintra.protocol.serial.port_detector import PortDetector
+from kineintra.protocol.packets.protocol_parser import (
     ProtocolParser,
     StatusPayload,
     DataPayload,
     AckPayload,
     ErrorPayload,
 )
-from protocol.frame_maker_api import HostPacketMakerAPI
+from kineintra.protocol.packets.frame_maker_api import HostPacketMakerAPI
 
 # Setup logging
 logging.basicConfig(

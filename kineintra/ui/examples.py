@@ -10,8 +10,8 @@ This module demonstrates:
 import logging
 import time
 from datetime import datetime
-from kineintra.protocol.serial_connection import SerialConfig
-from kineintra.protocol.frame_maker_api import HostPacketMakerAPI
+from kineintra.protocol.serial.serial_connection import SerialConfig
+from kineintra.protocol.packets.frame_maker_api import HostPacketMakerAPI
 from kineintra.ui.pyqt_app import DeviceCommunicationWorker, SensorReading
 
 # Setup logging

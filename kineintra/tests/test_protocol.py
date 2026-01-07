@@ -9,9 +9,9 @@ import struct
 from typing import List
 from unittest.mock import patch, MagicMock
 
-from kineintra.protocol.packet_reader import FrameParseResult
-from kineintra.protocol.packet_maker import HostPacketMaker
-from kineintra.protocol.config import FrameType, CmdID
+from kineintra.protocol.packets.packet_reader import FrameParseResult
+from kineintra.protocol.packets.packet_maker import HostPacketMaker
+from kineintra.protocol.packets.config import FrameType, CmdID
 from kineintra.tests.virtual_port import VirtualSerialPort, VirtualSerialModule
 
 
@@ -114,7 +114,7 @@ class TestSerialConnection:
     @patch("protocol.serial_connection.serial", new_callable=VirtualSerialModule)
     def test_connection_initialization(self, mock_serial):
         """Test serial connection initialization."""
-        from kineintra.protocol.serial_connection import (
+        from kineintra.protocol.serial.serial_connection import (
             SerialPortConnection,
             SerialConfig,
             ConnectionState,
@@ -128,7 +128,7 @@ class TestSerialConnection:
     @patch("protocol.serial_connection.serial", new_callable=VirtualSerialModule)
     def test_connection_connect_disconnect(self, mock_serial):
         """Test connecting and disconnecting."""
-        from kineintra.protocol.serial_connection import (
+        from kineintra.protocol.serial.serial_connection import (
             SerialPortConnection,
             SerialConfig,
             ConnectionState,
@@ -152,7 +152,7 @@ class TestSerialConnection:
     @patch("protocol.serial_connection.serial", new_callable=VirtualSerialModule)
     def test_connection_frame_reception(self, mock_serial):
         """Test receiving frames from virtual device."""
-        from kineintra.protocol.serial_connection import (
+        from kineintra.protocol.serial.serial_connection import (
             SerialPortConnection,
             SerialConfig,
             ConnectionState,
@@ -191,7 +191,7 @@ class TestSerialConnection:
     @patch("protocol.serial_connection.serial", new_callable=VirtualSerialModule)
     def test_connection_send_multiple_frames(self, mock_serial):
         """Test sending multiple frames and receiving responses."""
-        from kineintra.protocol.serial_connection import (
+        from kineintra.protocol.serial.serial_connection import (
             SerialPortConnection,
             SerialConfig,
             ConnectionState,
@@ -235,7 +235,7 @@ class TestSerialConnection:
     @patch("protocol.serial_connection.serial", new_callable=VirtualSerialModule)
     def test_connection_state_callbacks(self, mock_serial):
         """Test connection state change callbacks."""
-        from kineintra.protocol.serial_connection import (
+        from kineintra.protocol.serial.serial_connection import (
             SerialPortConnection,
             SerialConfig,
             ConnectionState,
@@ -267,7 +267,7 @@ class TestSerialConnection:
     @patch("protocol.serial_connection.serial", new_callable=VirtualSerialModule)
     def test_connection_statistics(self, mock_serial):
         """Test connection statistics tracking."""
-        from kineintra.protocol.serial_connection import (
+        from kineintra.protocol.serial.serial_connection import (
             SerialPortConnection,
             SerialConfig,
             ConnectionState,
@@ -306,7 +306,7 @@ class TestSerialConnection:
     @patch("protocol.serial_connection.serial", new_callable=VirtualSerialModule)
     def test_connection_error_handling(self, mock_serial):
         """Test error handling in connection."""
-        from kineintra.protocol.serial_connection import (
+        from kineintra.protocol.serial.serial_connection import (
             SerialPortConnection,
             SerialConfig,
         )
@@ -321,7 +321,7 @@ class TestSerialConnection:
     @patch("protocol.serial_connection.serial", new_callable=VirtualSerialModule)
     def test_connection_send_without_connection(self, mock_serial):
         """Test sending frame when not connected."""
-        from kineintra.protocol.serial_connection import (
+        from kineintra.protocol.serial.serial_connection import (
             SerialPortConnection,
             SerialConfig,
         )
@@ -342,7 +342,7 @@ class TestDeviceCommands:
     @patch("protocol.serial_connection.serial", new_callable=VirtualSerialModule)
     def test_get_status_command_sequence(self, mock_serial):
         """Test GET_STATUS command and response."""
-        from kineintra.protocol.serial_connection import (
+        from kineintra.protocol.serial.serial_connection import (
             SerialPortConnection,
             SerialConfig,
             ConnectionState,
@@ -382,7 +382,7 @@ class TestDeviceCommands:
     @patch("protocol.serial_connection.serial", new_callable=VirtualSerialModule)
     def test_measure_command_sequence(self, mock_serial):
         """Test START_MEASURE and STOP_MEASURE commands."""
-        from kineintra.protocol.serial_connection import (
+        from kineintra.protocol.serial.serial_connection import (
             SerialPortConnection,
             SerialConfig,
             ConnectionState,
@@ -425,7 +425,7 @@ class TestDeviceCommands:
     @patch("protocol.serial_connection.serial", new_callable=VirtualSerialModule)
     def test_set_rate_command(self, mock_serial):
         """Test SET_RATE command."""
-        from kineintra.protocol.serial_connection import (
+        from kineintra.protocol.serial.serial_connection import (
             SerialPortConnection,
             SerialConfig,
             ConnectionState,
