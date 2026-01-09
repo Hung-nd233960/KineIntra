@@ -226,7 +226,7 @@ class DeviceCommunicationWorker(QObject):
     def _on_frame_received(self, frame: FrameParseResult):
         """Handle received frame."""
         try:
-            parsed = self.protocol_parser.parse(frame)
+            parsed = self.protocol_parser.parse_frame(frame)
             if isinstance(parsed, StatusPayload):
                 self.status_received.emit(parsed)
             elif isinstance(parsed, DataPayload):

@@ -103,7 +103,7 @@ The device SHALL transmit a STATUS frame after boot, periodically (0.1–1 Hz), 
 | **ADCFlags** | 2 bytes | Bitfield reporting ADC/acquisition subsystem status. |
 | **Reserved** | 2 bytes | Set to zero. |
 
-**Total STATUS Payload Size:** 144 bytes.
+**Total STATUS Payload Size:** 142 bytes.
 
 ### 5.3 Role Table
 

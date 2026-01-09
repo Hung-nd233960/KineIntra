@@ -10,3 +10,12 @@ wheels/
 .venv
 .mypy_cache/
 .pytest_cache/
+.idea
+
+# direnv
+.direnv/
+.envrc.local
+
+# Environment variables (keep .env template in repo)
+# Uncomment if you want to ignore .env completely:
+# .env

@@ -110,14 +110,47 @@ class ErrorPayload:
         return error_names.get(self.error_code, f"UNKNOWN(0x{self.error_code:02X})")
 
 
+@dataclass
+class CommandPayload:
+    """Represents a decoded COMMAND frame payload (host-originated)."""
+
+    cmd_id: int
+    seq: int
+    args: bytes
+
+    def get_cmd_name(self) -> str:
+        """Best-effort name for the command ID."""
+        cmd_names = {
+            0x01: "GET_STATUS",
+            0x02: "START_MEASURE",
+            0x03: "STOP_MEASURE",
+            0x04: "SET_NSENSORS",
+            0x05: "SET_RATE",
+            0x06: "SET_BITS",
+            0x07: "SET_ACTIVEMAP",
+            0x08: "CALIBRATE",
+            0x09: "STOP_CALIBRATE",
+            0x10: "END_CALIBRATE",
+        }
+        return cmd_names.get(self.cmd_id, f"UNKNOWN(0x{self.cmd_id:02X})")
+
+
 # Union type for all possible parsed payloads
-ParsedPayload = Union[StatusPayload, DataPayload, AckPayload, ErrorPayload]
+ParsedPayload = Union[
+    StatusPayload,
+    DataPayload,
+    AckPayload,
+    ErrorPayload,
+    CommandPayload,
+]
 
 
 class ProtocolParser:
     """
     Parses binary frames into structured payload objects.
     Maintains state for decoding DATA frames based on last STATUS.
+    Handles both device-originated frames (STATUS/DATA/ACK/ERROR) and
+    host-originated COMMAND frames for loopback or testing scenarios.
     """
 
     def __init__(self):
@@ -151,6 +184,8 @@ class ProtocolParser:
                 payload = self._parse_ack(frame.payload)
             elif frame.msg_type == FrameType.ERROR:
                 payload = self._parse_error(frame.payload)
+            elif frame.msg_type == FrameType.COMMAND:
+                payload = self._parse_command(frame.payload)
             else:
                 error_msg = f"Unknown frame type: 0x{frame.msg_type:02X}"
                 self.parse_errors.append(error_msg)
@@ -164,10 +199,19 @@ class ProtocolParser:
             return frame_type_name, None
 
     def _parse_status(self, payload: bytes) -> StatusPayload:
-        """Parse STATUS frame payload (144 bytes)."""
-        if len(payload) < 144:
+        """Parse STATUS frame payload (142 bytes).
+
+        Structure:
+        - State (1) + NSensors (1) + ActiveMap (4) + HealthMap (4) = 10 bytes
+        - SampRateMap (64 bytes = 32 * uint16)
+        - BitsPerSmpMap (32 bytes = 32 * uint8)
+        - SensorRoleMap (32 bytes = 32 * uint8)
+        - ADCFlags (2) + Reserved (2) = 4 bytes
+        Total: 142 bytes
+        """
+        if len(payload) < 142:
             raise ValueError(
-                f"STATUS payload too short: {len(payload)} bytes, expected 144"
+                f"STATUS payload too short: {len(payload)} bytes, expected 142"
             )
 
         # Unpack fixed fields (offset 0-10)
@@ -182,8 +226,8 @@ class ProtocolParser:
         # Parse SensorRoleMap (offset 106-138, 32 bytes = 32 * uint8)
         sensor_role_map = list(struct.unpack("<" + "B" * 32, payload[106:138]))
 
-        # Parse ADCFlags and Reserved (offset 138-144)
-        adc_flags, reserved = struct.unpack("<HH", payload[138:144])
+        # Parse ADCFlags and Reserved (offset 138-142)
+        adc_flags, reserved = struct.unpack("<HH", payload[138:142])
 
         # Update internal state for future DATA parsing
         self.last_active_map = active_map
@@ -264,6 +308,17 @@ class ProtocolParser:
         return ErrorPayload(
             timestamp=timestamp, error_code=error_code, aux_data=aux_data
         )
+
+    def _parse_command(self, payload: bytes) -> CommandPayload:
+        """Parse COMMAND frame payload (CmdID | Seq | Args)."""
+        if len(payload) < 2:
+            raise ValueError(
+                f"COMMAND payload too short: {len(payload)} bytes, expected >=2"
+            )
+
+        cmd_id, seq = struct.unpack("<BB", payload[0:2])
+        args = payload[2:]
+        return CommandPayload(cmd_id=cmd_id, seq=seq, args=args)
 
     @staticmethod
     def _get_byte_width(resolution: int) -> int:

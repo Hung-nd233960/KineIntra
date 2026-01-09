@@ -147,6 +147,20 @@ class HostPacketMakerAPI:
         return HostPacketMaker.cmd_calibrate(seq=seq, mode=mode)
 
     @staticmethod
+    def stop_calibrate(seq: int) -> bytes:
+        """Create command packet to stop calibration (STOP_CALIBRATE)."""
+        if not HostPacketMakerAPI._verify_uint8(seq):
+            raise ValueError(f"Sequence number {seq} is out of uint8 range.")
+        return HostPacketMaker.cmd_stop_calibrate(seq=seq)
+
+    @staticmethod
+    def end_calibrate(seq: int) -> bytes:
+        """Create command packet to end calibration (END_CALIBRATE)."""
+        if not HostPacketMakerAPI._verify_uint8(seq):
+            raise ValueError(f"Sequence number {seq} is out of uint8 range.")
+        return HostPacketMaker.cmd_end_calibrate(seq=seq)
+
+    @staticmethod
     def set_frame_rate(seq: int, sensor_idx: int, rate_hz: int) -> bytes:
         """
         Create command packet to set sensor frame rate.
