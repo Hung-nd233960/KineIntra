@@ -22,7 +22,6 @@ from kineintra.protocol.packets.protocol_parser import (
     ErrorPayload,
 )
 from kineintra.protocol.packets.packet_reader import FrameParseResult
-from kineintra.protocol.packets.config import FrameType
 from kineintra.protocol.packets.frame_maker_api import HostPacketMakerAPI
 
 try:
@@ -164,20 +163,21 @@ class DeviceClient:
         if payload is None:
             return
 
-        if msg_type == FrameType.STATUS and isinstance(payload, StatusPayload):
+        # msg_type is a string name (e.g., "STATUS"), compare as strings
+        if msg_type == "STATUS" and isinstance(payload, StatusPayload):
             self._last_status = payload
             self._event_queue.put(("STATUS", payload))
             with self._cb_lock:
                 self._dispatch_callbacks(self._status_cbs, payload, "status")
-        elif msg_type == FrameType.DATA and isinstance(payload, DataPayload):
+        elif msg_type == "DATA" and isinstance(payload, DataPayload):
             self._event_queue.put(("DATA", payload))
             with self._cb_lock:
                 self._dispatch_callbacks(self._data_cbs, payload, "data")
-        elif msg_type == FrameType.ACK and isinstance(payload, AckPayload):
+        elif msg_type == "ACK" and isinstance(payload, AckPayload):
             self._event_queue.put(("ACK", payload))
             with self._cb_lock:
                 self._dispatch_callbacks(self._ack_cbs, payload, "ack")
-        elif msg_type == FrameType.ERROR and isinstance(payload, ErrorPayload):
+        elif msg_type == "ERROR" and isinstance(payload, ErrorPayload):
             self._event_queue.put(("ERROR", payload))
             with self._cb_lock:
                 self._dispatch_callbacks(self._error_cbs, payload, "error")

@@ -153,7 +153,7 @@ class SerialPortConnection:
             self._start_receive_thread()
             return True
 
-        except (serial.SerialException, TimeoutError) as e:  # type: ignore
+        except (OSError, TimeoutError) as e:
             error_msg = f"Failed to connect to {self.config.port}: {str(e)}"
             self.logger.error(error_msg)
             self.last_error = error_msg

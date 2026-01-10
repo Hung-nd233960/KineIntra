@@ -39,17 +39,47 @@ def cmd_ports(args):
 
 
 def _make_client(args) -> DeviceClient:
+    # Enable TCP virtual server mode if requested
+    if hasattr(args, "tcp_host") and args.tcp_host:
+        try:
+            from kineintra.virtual import patch_serial_for_tcp
+
+            patch_serial_for_tcp(
+                host=args.tcp_host, port=getattr(args, "tcp_port", 8888)
+            )
+            # Mark that we're using TCP mode
+            args._use_tcp = True
+        except Exception as e:
+            print(f"Failed to enable TCP mode: {e}", file=sys.stderr)
+            args._use_tcp = False
+    else:
+        args._use_tcp = False
     return DeviceClient(use_virtual=(args.port == "virtual"))
+
+
+def _get_connect_port(args) -> str | None:
+    """Determine the port to pass to connect() based on mode."""
+    if getattr(args, "_use_tcp", False):
+        return "tcp"  # Dummy port name, TCP adapter ignores it
+    if args.port == "virtual":
+        return None
+    return args.port
 
 
 def cmd_connect(args):
     client = _make_client(args)
-    if not client.connect(
-        port=None if args.port == "virtual" else args.port, timeout=args.timeout
-    ):
+    if not client.connect(port=_get_connect_port(args), timeout=args.timeout):
         print("Failed to connect", file=sys.stderr)
         return 1
-    print(f"Connected to {args.port}")
+    connect_info = _get_connect_port(args) or "virtual"
+    if getattr(args, "_use_tcp", False):
+        connect_info = f"tcp://{args.tcp_host}:{args.tcp_port}"
+    print(f"Connected to {connect_info}")
+    # Optionally send an initial command before monitoring
+    if getattr(args, "send_status", False):
+        client.get_status(seq=getattr(args, "seq", 1))
+    if getattr(args, "start", False):
+        client.start_measure(seq=getattr(args, "seq", 1))
     if args.monitor:
         _monitor_loop(client, args)
     client.disconnect()
@@ -58,9 +88,7 @@ def cmd_connect(args):
 
 def cmd_status(args):
     client = _make_client(args)
-    if not client.connect(
-        port=None if args.port == "virtual" else args.port, timeout=args.timeout
-    ):
+    if not client.connect(port=_get_connect_port(args), timeout=args.timeout):
         print("Failed to connect", file=sys.stderr)
         return 1
     client.get_status(seq=args.seq)
@@ -71,9 +99,7 @@ def cmd_status(args):
 
 def cmd_simple(args, kind: str):
     client = _make_client(args)
-    if not client.connect(
-        port=None if args.port == "virtual" else args.port, timeout=args.timeout
-    ):
+    if not client.connect(port=_get_connect_port(args), timeout=args.timeout):
         print("Failed to connect", file=sys.stderr)
         return 1
     ok = True
@@ -97,9 +123,7 @@ def cmd_simple(args, kind: str):
 
 def cmd_set_nsensors(args):
     client = _make_client(args)
-    if not client.connect(
-        port=None if args.port == "virtual" else args.port, timeout=args.timeout
-    ):
+    if not client.connect(port=_get_connect_port(args), timeout=args.timeout):
         print("Failed to connect", file=sys.stderr)
         return 1
     client.set_nsensors(args.seq, args.n)
@@ -110,9 +134,7 @@ def cmd_set_nsensors(args):
 
 def cmd_set_rate(args):
     client = _make_client(args)
-    if not client.connect(
-        port=None if args.port == "virtual" else args.port, timeout=args.timeout
-    ):
+    if not client.connect(port=_get_connect_port(args), timeout=args.timeout):
         print("Failed to connect", file=sys.stderr)
         return 1
     client.set_rate(args.seq, args.sensor_idx, args.hz)
@@ -123,9 +145,7 @@ def cmd_set_rate(args):
 
 def cmd_set_bits(args):
     client = _make_client(args)
-    if not client.connect(
-        port=None if args.port == "virtual" else args.port, timeout=args.timeout
-    ):
+    if not client.connect(port=_get_connect_port(args), timeout=args.timeout):
         print("Failed to connect", file=sys.stderr)
         return 1
     client.set_bits(args.seq, args.sensor_idx, args.bits)
@@ -136,9 +156,7 @@ def cmd_set_bits(args):
 
 def cmd_set_active(args):
     client = _make_client(args)
-    if not client.connect(
-        port=None if args.port == "virtual" else args.port, timeout=args.timeout
-    ):
+    if not client.connect(port=_get_connect_port(args), timeout=args.timeout):
         print("Failed to connect", file=sys.stderr)
         return 1
     mapping = _parse_active_map(args.map)
@@ -150,11 +168,14 @@ def cmd_set_active(args):
 
 def cmd_monitor(args):
     client = _make_client(args)
-    if not client.connect(
-        port=None if args.port == "virtual" else args.port, timeout=args.timeout
-    ):
+    if not client.connect(port=_get_connect_port(args), timeout=args.timeout):
         print("Failed to connect", file=sys.stderr)
         return 1
+    # Optionally send an initial command before monitoring
+    if getattr(args, "send_status", False):
+        client.get_status(seq=getattr(args, "seq", 1))
+    if getattr(args, "start", False):
+        client.start_measure(seq=getattr(args, "seq", 1))
     try:
         _monitor_loop(client, args)
     finally:
@@ -164,9 +185,7 @@ def cmd_monitor(args):
 
 def cmd_stats(args):
     client = _make_client(args)
-    if not client.connect(
-        port=None if args.port == "virtual" else args.port, timeout=args.timeout
-    ):
+    if not client.connect(port=_get_connect_port(args), timeout=args.timeout):
         print("Failed to connect", file=sys.stderr)
         return 1
     print(client.get_statistics())
@@ -201,7 +220,9 @@ def _print_event(etype: str, payload):
 
         print(f"STATUS {format_status(payload)}")
     elif etype == "DATA":
-        print(f"DATA ts={payload.timestamp} samples={payload.samples}")
+        n_samples = len(payload.samples) if payload.samples else 0
+        sensors = list(payload.samples.keys()) if payload.samples else []
+        print(f"DATA ts={payload.timestamp} n_samples={n_samples} sensors={sensors}")
     elif etype == "ACK":
         print(f"ACK cmd={payload.cmd_id} seq={payload.seq} result={payload.result}")
     elif etype == "ERROR":
@@ -236,6 +257,12 @@ def build_parser():
     conn_parent.add_argument(
         "--timeout", type=float, default=2.0, help="Connection timeout seconds"
     )
+    conn_parent.add_argument(
+        "--tcp-host", help="Connect via TCP virtual server at host"
+    )
+    conn_parent.add_argument(
+        "--tcp-port", type=int, default=8888, help="TCP virtual server port"
+    )
 
     sub = p.add_subparsers(dest="cmd", required=True)
 
@@ -250,6 +277,13 @@ def build_parser():
     sub_connect.add_argument(
         "--types", help="Comma list of types to show (STATUS,DATA,ACK,ERROR)"
     )
+    sub_connect.add_argument(
+        "--send-status", action="store_true", help="Send GET_STATUS on connect"
+    )
+    sub_connect.add_argument(
+        "--start", action="store_true", help="Send START_MEASURE on connect"
+    )
+    sub_connect.add_argument("--seq", type=int, default=1)
     sub_connect.set_defaults(func=cmd_connect)
 
     sub_status = sub.add_parser("status", parents=[conn_parent], help="Send GET_STATUS")
@@ -319,6 +353,13 @@ def build_parser():
     sub_mon.add_argument(
         "--types", help="Comma list of types to show (STATUS,DATA,ACK,ERROR)"
     )
+    sub_mon.add_argument(
+        "--send-status", action="store_true", help="Send GET_STATUS before monitoring"
+    )
+    sub_mon.add_argument(
+        "--start", action="store_true", help="Send START_MEASURE before monitoring"
+    )
+    sub_mon.add_argument("--seq", type=int, default=1)
     sub_mon.set_defaults(func=cmd_monitor)
 
     sub_stats = sub.add_parser(

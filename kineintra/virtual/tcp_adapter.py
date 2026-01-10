@@ -7,6 +7,7 @@ Allows DeviceClient to connect to the virtual device TCP server.
 
 import socket
 import logging
+import select
 from typing import Optional
 
 
@@ -34,7 +35,6 @@ class TCPSerialAdapter:
 
         self._socket: Optional[socket.socket] = None
         self.is_open = False
-        self.in_waiting = 0
 
         self._logger = logging.getLogger("TCPSerialAdapter")
 
@@ -64,6 +64,21 @@ class TCPSerialAdapter:
                 pass
         self.is_open = False
         self._logger.info("Disconnected from TCP server")
+
+    @property
+    def in_waiting(self) -> int:
+        """Return number of bytes available to read (non-blocking)."""
+        if not self.is_open or not self._socket:
+            return 0
+        try:
+            rlist, _, _ = select.select([self._socket], [], [], 0)
+            if not rlist:
+                return 0
+            # Peek up to 4096 bytes to estimate available data
+            data = self._socket.recv(4096, socket.MSG_PEEK)
+            return len(data)
+        except Exception:
+            return 0
 
     def write(self, data: bytes) -> int:
         """
@@ -99,8 +114,15 @@ class TCPSerialAdapter:
             raise OSError("Connection is closed")
 
         try:
-            # Non-blocking receive with timeout
-            data = self._socket.recv(size)
+            # If size is 0 or negative, default to 4096
+            read_size = size if size and size > 0 else 4096
+
+            # Use select to avoid blocking if nothing is ready
+            rlist, _, _ = select.select([self._socket], [], [], self.timeout)
+            if not rlist:
+                return b""
+
+            data = self._socket.recv(read_size)
             return data
         except socket.timeout:
             return b""

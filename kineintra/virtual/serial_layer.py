@@ -35,7 +35,7 @@ class VirtualSerialPort:
         self._logger = logger or self._setup_logger()
 
         self.is_open = True
-        self.in_waiting = 0
+        self._in_waiting = 0  # Internal state
         self.timeout = 1.0
         self.write_timeout = 1.0
 
@@ -56,6 +56,12 @@ class VirtualSerialPort:
 
         self._logger.info("Virtual serial port opened")
 
+    @property
+    def in_waiting(self) -> int:
+        """Get number of bytes available to read (updates dynamically)."""
+        self._in_waiting = self._rx_queue.qsize()
+        return self._in_waiting
+
     def _setup_logger(self) -> logging.Logger:
         """Setup default logger with timestamps."""
         logger = logging.getLogger("VirtualPort")
@@ -71,7 +77,7 @@ class VirtualSerialPort:
 
     def close(self) -> None:
         """Close the virtual port."""
-        if not self.is_open:
+        if self.is_open:
             return
 
         self._logger.info("Closing virtual serial port")
@@ -111,9 +117,7 @@ class VirtualSerialPort:
         if not self.is_open:
             raise OSError("Port is closed")
 
-        # Update in_waiting count
-        self.in_waiting = self._rx_queue.qsize()
-
+        # in_waiting is now a property that updates dynamically
         if self.in_waiting == 0:
             return b""
 
@@ -125,11 +129,6 @@ class VirtualSerialPort:
                 data.extend(chunk)
             except Empty:
                 break
-
-        self.in_waiting = self._rx_queue.qsize()
-
-        if data:
-            self._logger.debug(f"Host read {len(data)} bytes from device")
 
         return bytes(data)
 
@@ -220,8 +219,7 @@ class VirtualSerialPort:
                     self._rx_queue.put(status_frame)
                     last_status_time = current_time
 
-                # Keep in_waiting in sync with queued data
-                self.in_waiting = self._rx_queue.qsize()
+                # in_waiting is now a dynamic property, no need to set it
 
                 time.sleep(0.001)  # 1ms polling interval
 

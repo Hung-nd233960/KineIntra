@@ -11,6 +11,10 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = ["pyserial>=3.5", "PyQt6>=6.6.0"]
 
+[project.scripts]
+kineintra-cli = "kineintra.cli:main"
+kineintra-host = "kineintra.host_client_cli:main"
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["kineintra*"]
