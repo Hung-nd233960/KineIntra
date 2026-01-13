@@ -14,6 +14,8 @@ dependencies = ["pyserial>=3.5", "PyQt6>=6.6.0"]
 [project.scripts]
 kineintra-cli = "kineintra.cli:main"
 kineintra-host = "kineintra.host_client_cli:main"
+kineintra-gui = "kineintra.gui.main_window:main"
+kineintra-server = "kineintra.virtual.server:main"
 
 [tool.setuptools.packages.find]
 where = ["."]

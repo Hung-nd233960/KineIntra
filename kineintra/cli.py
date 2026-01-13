@@ -222,7 +222,11 @@ def _print_event(etype: str, payload):
     elif etype == "DATA":
         n_samples = len(payload.samples) if payload.samples else 0
         sensors = list(payload.samples.keys()) if payload.samples else []
-        print(f"DATA ts={payload.timestamp} n_samples={n_samples} sensors={sensors}")
+        values = payload.samples
+        print(
+            f"DATA ts={payload.timestamp} n_samples={n_samples} sensors={sensors} data={values}"
+        )
+
     elif etype == "ACK":
         print(f"ACK cmd={payload.cmd_id} seq={payload.seq} result={payload.result}")
     elif etype == "ERROR":
