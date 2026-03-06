@@ -1,32 +1,109 @@
-# BioMechanics Microprocessor GUI & CLI
+# Project Structure
 
-This repository contains a PyQt6 GUI application and related tooling for controlling the BioMechanics Microprocessor, analyzing experiment data, and prototyping communication protocols. A developer-friendly command-line interface (CLI) is also available for scripting and quick device interactions.
+This repository contains the full development stack for KineIntra, including mechanical design, electronics, firmware, and PC-side software.
 
-## Getting Started
+## Top-Level Structure
 
-1. Ensure Python 3.10+ is installed.
-2. Create and activate a virtual environment (optional but recommended).
-3. Install dependencies:
-
-```bash
-pip install -r requirements.txt
+```
+KineIntra/
+├── reports/        # Formal reports, papers, and documentation deliverables
+├── mechanical/     # Mechanical design (CAD models, assemblies, drawings)
+├── electronics/    # Electrical schematics, PCB layouts, and hardware BOM
+├── firmware/       # Microcontroller code running on the embedded device
+├── software/       # PC-side software for data collection and analysis
+├── experiments/    # Experimental logs, datasets, and prototype testing
+├── docs/           # System documentation and architecture descriptions
+└── management/     # Project tracking, roadmap, and engineering decisions
 ```
 
-## Structure
+## Folder Descriptions
 
-- `kineintra/`: Core library and CLI.
-- `Communication_Stack/`: Legacy experiments and protocol prototypes.
-- `data_processing/`: Scripts and datasets for experiments.
-- `tests/`: Unit tests for core functionality.
+### `reports/`
 
-## CLI Manual
+Contains formal documentation produced during the project lifecycle.
 
-For full details on the command-line tool (listing ports, connecting to real or virtual devices, sending commands, monitoring events, etc.), see [docs/CLI.md](docs/CLI.md).
+Examples:
 
-Quick start:
+* project proposal
+* progress reports
+* technical papers
+* final report
 
-```bash
-python -m kineintra.cli ports
-python -m kineintra.cli connect --port virtual --monitor
-python -m kineintra.cli status --seq 1
-```
+### `mechanical/`
+
+Mechanical engineering design files.
+
+Examples:
+
+* CAD assemblies
+* part models
+* mechanical drawings
+* mechanical bill of materials (BOM)
+
+### `electronics/`
+
+Electrical and PCB design files.
+
+Examples:
+
+* circuit schematics
+* PCB layouts
+* Gerber manufacturing files
+* electronic components BOM
+
+### `firmware/`
+
+Embedded software running on the microcontroller.
+
+Responsibilities include:
+
+* sensor data acquisition
+* actuator control
+* device communication protocol
+* low-level hardware control
+
+### `software/`
+
+PC-side software responsible for higher-level processing.
+
+Typical functions:
+
+* device communication
+* data logging
+* signal processing
+* inference / analysis
+* visualization and control interfaces
+
+### `experiments/`
+
+Experimental work and testing results.
+
+Examples:
+
+* experiment notes
+* raw datasets
+* analysis outputs
+* validation tests
+
+### `docs/`
+
+Technical documentation describing system architecture and design.
+
+Examples:
+
+* system architecture
+* communication protocol
+* calibration procedures
+* safety documentation
+
+### `management/`
+
+Project coordination and planning resources.
+
+Examples:
+
+* project roadmap
+* task tracking
+* decision logs
+* meeting notes
+
